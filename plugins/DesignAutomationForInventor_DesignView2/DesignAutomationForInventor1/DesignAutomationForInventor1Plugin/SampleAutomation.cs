@@ -204,8 +204,20 @@ namespace DesignAutomationForInventor1Plugin
 
                     string modulesDir = (string)map.Value["_2"];
 
+                    // Specifies how far we should go with execution
+                    int currentStep = 0;
+                    int maxStep = 1000;
+                    try
+                    {
+                        maxStep = int.Parse(map.Value["_3"]);
+                        LogTrace($"We will quit early after step #{maxStep}");
+                    }
+                    catch { }
+
                     LogTrace("Assembling modules");
                     doc = inventorApplication.Documents.Add(DocumentTypeEnum.kAssemblyDocumentObject, "", false);
+
+                    if (currentStep++ >= maxStep) return;
                     
                     // Let's save it (and provide file name for it) befroe doing anything else with it
                     // If we tried to do it in the end with 2022 engine, we'd get an error
@@ -213,9 +225,13 @@ namespace DesignAutomationForInventor1Plugin
                     doc.SaveAs(assemblyPath, false);
                     AssemblyDocument asmDoc = doc as AssemblyDocument;
 
+                    if (currentStep++ >= maxStep) return;
+
                     // Add Design View representation in case we need it
                     DesignViewRepresentation dvr = asmDoc.ComponentDefinition.RepresentationsManager.DesignViewRepresentations.Add("Default");
-                    dvr.Activate(); 
+                    dvr.Activate();
+
+                    if (currentStep++ >= maxStep) return;
 
                     AssemblyComponentDefinition compDef = asmDoc.ComponentDefinition;
                     TransientGeometry geom = inventorApplication.TransientGeometry;
@@ -293,13 +309,22 @@ namespace DesignAutomationForInventor1Plugin
                         }
                     }
 
+                    if (currentStep++ >= maxStep) return;
+
                     LogTrace("Finishing assembly");
                     doc.Update();
 
+                    if (currentStep++ >= maxStep) return;
+
                     LogTrace("Saving assembly");
                     doc.Save2();
+
+                    if (currentStep++ >= maxStep) return;
+
                     var rfaPath = System.IO.Path.Combine(currentDir, "output.rfa");
                     ExportRFA(doc, rfaPath);
+
+                    if (currentStep++ >= maxStep) return;
 
                     /*
                     LogTrace("Copying referenced documents to working folder");
@@ -323,6 +348,8 @@ namespace DesignAutomationForInventor1Plugin
                             archive.CreateEntryFromFile(fileName, System.IO.Path.GetFileName(fileName));
                         }
                     }
+
+                    if (currentStep++ >= maxStep) return;
 
                     LogTrace("Closing assembly");
                     doc.Close(true);
