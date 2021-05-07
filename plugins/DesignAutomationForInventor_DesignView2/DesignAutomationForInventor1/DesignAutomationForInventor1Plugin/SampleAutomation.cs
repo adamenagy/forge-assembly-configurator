@@ -354,20 +354,6 @@ namespace DesignAutomationForInventor1Plugin
                     LogTrace("Closing assembly");
                     doc.Close(true);
 
-
-                    try
-                    {
-                        // If there is a 4th input param, we will list the contents of the current folder
-                        var listFolderContent = map.Value["_4"];
-                        LogTrace("Contents of current folder:");
-                        string[] files = System.IO.Directory.GetFiles(currentDir, "*", System.IO.SearchOption.AllDirectories);
-                        foreach (string file in files)
-                        {
-                            LogTrace(file);
-                        }
-                    }
-                    catch { }
-
                     /*
                     LogTrace("Compressing output");
                     using (var archive = ZipFile.Open(System.IO.Path.Combine(documentDir, "output.zip"), ZipArchiveMode.Create))
